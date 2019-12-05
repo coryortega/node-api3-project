@@ -25,23 +25,4 @@ function logger(req, res, next) {
   next();
 }
 
-function gateKeeper(req, res, next) {
-  const password = req.headers.password;
-
-  if (password && password.toLowerCase() === "mellon") {
-    next();
-  } else {
-    res.status(401).json({ you: "shall not pass!!" });
-  }
-}
-
-function checkRole(role) {
-  return function(req, res, next) {
-    if (role && role === req.headers.role) {
-      next();
-    } else {
-      res.status(403).json({ message: "can't touch this!" });
-    }
-  };
-}
 module.exports = server;

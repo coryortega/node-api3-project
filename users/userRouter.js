@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 
 const Users = require('./userDb.js');
+const Posts = require('../posts/postDb.js');
 
 router.post('/', validateUser, (req, res) => {
   // do your magic!
@@ -19,8 +20,20 @@ router.post('/', validateUser, (req, res) => {
   });
 });
 
-router.post('/:id/posts', (req, res) => {
+router.post('/:id/posts', validatePost, (req, res) => {
   // do your magic!
+  Posts.insert(req.body)
+  .then(post => {
+    res.status(201).json(post);
+  })
+  .catch(error => {
+    // log error to server
+    console.log(error);
+    res.status(500).json({
+      message: 'Error adding the post to the user',
+    });
+  });
+
 });
 
 router.get('/', (req, res) => {
@@ -57,7 +70,7 @@ router.get('/:id', validateUserId, (req, res) => {
   });
 });
 
-router.get('/:id/posts', (req, res) => {
+router.get('/:id/posts', validateUserId, (req, res) => {
   // do your magic!
   Users.getUserPosts(req.params.id)
   .then(user => {
@@ -76,7 +89,7 @@ router.get('/:id/posts', (req, res) => {
   });
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', validateUserId, (req, res) => {
   // do your magic!
   Users.remove(req.params.id)
   .then(count => {
@@ -95,7 +108,7 @@ router.delete('/:id', (req, res) => {
   });
 });
 
-router.put('/:id', (req, res) => {
+router.put('/:id', validateUserId, (req, res) => {
   // do your magic!
   Users.update(req.params.id, req.body)
   .then(user => {
@@ -123,7 +136,7 @@ function validateUserId(req, res, next) {
     if (user) {
       req.user = user
     } else {
-      res.status(400).json({ errorMessage: 'invalid post ID' })
+      res.status(400).json({ errorMessage: 'invalid user ID' })
     }
   })
  next();
@@ -133,13 +146,18 @@ function validateUser(req, res, next) {
   // do your magic!
   const userData = req.body;
   if(!userData.name){
-    res.status(400).json({ errorMessage: "you need a name"})
+    res.status(400).json({ errorMessage: "you need a name" })
   }
  next();
 }
 
 function validatePost(req, res, next) {
   // do your magic!
+  const userData = req.body;
+  if(!userData.text){
+    res.status(400).json({ errorMessage: "you need text" })
+  }
+ next();
 
 }
 

@@ -38,7 +38,7 @@ router.get('/:id', validatePostId, (req, res) => {
   });
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', validatePostId, (req, res) => {
   // do your magic!
   Posts.remove(req.params.id)
   .then(count => {
@@ -57,7 +57,7 @@ router.delete('/:id', (req, res) => {
   });
 });
 
-router.put('/:id', (req, res) => {
+router.put('/:id', validatePostId, (req, res) => {
   // do your magic!
   Posts.update(req.params.id, req.body)
   .then(post => {
